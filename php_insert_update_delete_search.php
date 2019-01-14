@@ -17,7 +17,7 @@ $lname = "";
 $age = "";
 
 
-mysqli_report(mysqli_report_error | mysqli_report_strict)
+//mysqli_report(mysqli_report_error | mysqli_report_strict);
 
 try{
     $connect = mysqli_connect($host, $user, $password, $database);
@@ -40,14 +40,14 @@ if(isset($_POST['search'])){
 
     $data = getPosts();
 
-    $searchQuery = 'SELECT * FROM  users WHERE id = $data[0]';
+    $searchQuery = 'SELECT * FROM  users WHERE id = '.$data[0];
+    echo $searchQuery;
+    $search_Result = mysqli_query($connect, $searchQuery);
 
-    $seach_Result = mysqli_query($connect, $searchQuery);
 
-
-    if($seach_Result){
-        if(mysqli_num_rows($seach_Result)){
-            while($row = mysqli_fetch_array($seach_Result)){
+    if($search_Result){
+        if(mysqli_num_rows($search_Result)){
+            while($row = mysqli_fetch_array($search_Result)){
                 $id = $row['id'];
                 $fname = $row['fname'];
                 $lname= $row['lname'];
@@ -62,31 +62,12 @@ if(isset($_POST['search'])){
 
 }
 
-if(isset($_POST['insert'])){
-    $data = getPosts();
-    $insert_Query = 'INSERT INTO 'users' ('fname', 'lname', 'age') VALUES ('$data[1]', '$data[2]', '$data[3]')';
 
-    try{
-        $insert_Result = mysqli_query($connect, $insert_Query);
-
-        if($insert_Result){
-            if(mysqli_affected_rows($connect)>0){
-                echo 'Data Inserted';
-            }else{
-                echo 'Data not Inserted';
-            }
-        }
-
-    }catch (Exception $ex){
-        echo 'Error Insert '.$ex->getMessage();
-    }
-
-}
 
 
 if(isset($_POST['delete'])){
     $data = getPosts();
-    $delete_Query = 'DELETE FROM 'users' WHERE 'id = $data[0]'';
+    $delete_Query = 'DELETE FROM users WHERE id = '.$data[0];
 
     try{
         $delete_Result = mysqli_query($connect, $delete_Query);
@@ -105,9 +86,32 @@ if(isset($_POST['delete'])){
 
 }
 
+
+if(isset($_POST['insert'])){
+    $data = getPosts();
+    $insert_Query = 'INSERT INTO users (fname, lname, age) VALUES ("'.$data[1].'", "'.$data[2].'", '.$data[3].');';
+    echo $insert_Query ;
+
+    try{
+        $insert_Result = mysqli_query($connect, $insert_Query);
+
+        if($insert_Result){
+            if(mysqli_affected_rows($connect)>0){
+                echo 'Data Inserted';
+            }else{
+                echo 'Data not Inserted';
+            }
+        }
+
+    }catch (Exception $ex){
+        echo 'Error Insert '.$ex->getMessage();
+    }
+
+}
+
 if(isset($_POST['update'])){
     $data = getPosts();
-    $update_Query = 'UPDATE 'users' SET 'fname'='$data[1]', 'fname'='$data[2]', 'age'='$data[3]' WHERE 'id' = '$data[0]'';
+    $update_Query = 'UPDATE users SET fname="'.$data[1].'", lname="'.$data[2].'", age='.$data[3].' WHERE id = '.$data[0];
 
     try{
         $update_Result = mysqli_query($connect, $update_Query);
@@ -132,7 +136,7 @@ if(isset($_POST['update'])){
         <title>Let's try</title>
     </head>
     <body>
-        <from action="php_insert_update_delete_search.php" method="post">
+        <form action="php_insert_update_delete_search.php" method="post">
             <input type="number" name="id" placeholder="Id" value="<?php echo $id;?>"><br><br>
             <input type="text" name="fname" placeholder="First Name" value="<?php echo $fname;?>"><br><br>
             <input type="text" name="lname" placeholder="Last Name" value="<?php echo $lname;?>"><br><br>
@@ -144,6 +148,6 @@ if(isset($_POST['update'])){
                 <input type="submit" name="search" value="Find">
             </div>
 
-        </from>
+        </form>
     </body>
 </html>
